@@ -1,0 +1,51 @@
+
+version: '3.8'
+
+services:
+
+  app1:
+
+    build: .
+
+    ports:
+
+      - "8001:8000"
+
+    environment:
+
+      - SERVICE_NAME=app1
+
+    container_name: fastapi-app1
+
+    
+
+  app2:
+
+    build: .
+
+    ports:
+
+      - "8002:8000"
+
+    environment:
+
+      - SERVICE_NAME=app2
+
+    container_name: fastapi-app2
+
+    
+
+  app3:
+
+    build: .
+
+    ports:
+
+      - "8003:8000"
+
+    environment:
+
+      - SERVICE_NAME=app3
+
+    container_name: fastapi-app3
+
