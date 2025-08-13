@@ -1,5 +1,7 @@
 version: "3.7"
 
+
+
 services:
 
   fastapi-app:
@@ -10,11 +12,67 @@ services:
 
       dockerfile: Dockerfile
 
-    container_name: FastApi-app
+    container_name: fastapi-app
 
     ports:
 
       - "5001:5001"
+
+    depends_on:
+
+      - loki
+
+    environment:
+
+      - LOKI_ENDPOINT=http://loki:3100/loki/api/v1/push
+
+    networks:
+
+      - loadtest-net
+
+
+
+  jmeter:
+
+    build:
+
+      context: ./jmeter
+
+      dockerfile: Dockerfile
+
+    container_name: jmeter
+
+    volumes:
+
+      - ./jmeter:/jmeter
+
+    command:
+
+      - jmeter
+
+      - -n
+
+      - -t
+
+      - /jmeter/fastapi_test_plan.jmx
+
+      - -l
+
+      - /jmeter/results.jtl
+
+      - -JBASE_URL=http://fastapi-app:5001
+
+      - -Jjmeter.save.saveservice.output_format=csv
+
+      - -e
+
+      - -o
+
+      - /jmeter/report
+
+    networks:
+
+      - loadtest-net
 
 
 
@@ -42,6 +100,10 @@ services:
 
       - sonarqube_extensions:/opt/sonarqube/extensions
 
+    networks:
+
+      - loadtest-net
+
 
 
   prometheus:
@@ -58,9 +120,9 @@ services:
 
       - "7070:9090"
 
-    command:
+    networks:
 
-      - "--config.file=/etc/prometheus/prometheus.yml"
+      - loadtest-net
 
 
 
@@ -82,6 +144,10 @@ services:
 
       - grafana-data:/var/lib/grafana
 
+    networks:
+
+      - loadtest-net
+
 
 
   node-exporter:
@@ -93,6 +159,34 @@ services:
     ports:
 
       - "7100:9100"
+
+    networks:
+
+      - loadtest-net
+
+
+
+  loki:
+
+    image: grafana/loki:latest
+
+    container_name: loki
+
+    ports:
+
+      - "3100:3100"
+
+    networks:
+
+      - loadtest-net
+
+
+
+networks:
+
+  loadtest-net:
+
+    driver: bridge
 
 
 
