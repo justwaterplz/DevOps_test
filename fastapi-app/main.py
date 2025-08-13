@@ -8,10 +8,11 @@ import json
 
 import os
 from typing import List
-
+from prometheus_fastapi_instrumentator import Instrumentator
 
 
 app = FastAPI()
+Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 
 
